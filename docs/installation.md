@@ -24,7 +24,7 @@ sudo apt update
 sudo apt install -y php-cli php-mbstring php-sqlite3 php-mysql php-curl php-gd php-xml composer
 
 # ติดตั้ง NEWLA CLI
-curl -fsSL https://raw.githubusercontent.com/newla-php/newla/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | sh
 ```
 
 ---
@@ -36,7 +36,7 @@ curl -fsSL https://raw.githubusercontent.com/newla-php/newla/main/install.sh | s
 brew install php composer
 
 # ติดตั้ง NEWLA CLI
-curl -fsSL https://raw.githubusercontent.com/newla-php/newla/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | sh
 ```
 
 ---
@@ -58,7 +58,7 @@ curl -fsSL https://raw.githubusercontent.com/newla-php/newla/main/install.sh | s
 
 2. รันคำสั่งติดตั้งผ่าน PowerShell:
 ```powershell
-iwr -useb https://raw.githubusercontent.com/newla-php/newla/main/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/newkii308/newla/main/install.ps1 | iex
 ```
 
 หรือติดตั้งผ่าน Composer:
@@ -80,7 +80,7 @@ pkg update && pkg upgrade
 pkg install -y php composer git
 
 # ติดตั้ง NEWLA CLI
-curl -fsSL https://raw.githubusercontent.com/newla-php/newla/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | sh
 ```
 
 ---

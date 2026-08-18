@@ -27,12 +27,12 @@
 
 #### สำหรับ Linux / macOS / Termux:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/newla-php/newla/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | sh
 ```
 
 #### สำหรับ Windows (PowerShell):
 ```powershell
-iwr -useb https://raw.githubusercontent.com/newla-php/newla/main/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/newkii308/newla/main/install.ps1 | iex
 ```
 
 #### หรือติดตั้งผ่าน Composer Global:

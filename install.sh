@@ -24,7 +24,7 @@ fi
 
 # Download or link binary
 echo "Installing newla binary to $INSTALL_DIR/newla..."
-curl -fsSL https://raw.githubusercontent.com/newla-php/newla/main/cli/bin/newla -o "$INSTALL_DIR/newla"
+curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/cli/bin/newla -o "$INSTALL_DIR/newla"
 chmod +x "$INSTALL_DIR/newla"
 
 echo "\033[1;32m✓ NEWLA CLI installed successfully!\033[0m"

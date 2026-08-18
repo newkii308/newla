@@ -14,7 +14,7 @@ if (!(Test-Path $targetDir)) {
     New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
 }
 
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/newla-php/newla/main/cli/bin/newla" -OutFile "$targetDir\newla"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/newkii308/newla/main/cli/bin/newla" -OutFile "$targetDir\newla"
 Set-Content -Path "$targetDir\newla.bat" -Value "@echo off`r`nphp `"$targetDir\newla`" %*" -Encoding ascii
 
 $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
