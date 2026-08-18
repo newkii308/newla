@@ -18,9 +18,26 @@ class LocalStorageDriver implements StorageDriverInterface
         }
     }
 
+    public function normalizeRelativePath(string $path): string
+    {
+        $path = str_replace(['\\'], '/', $path);
+        $parts = [];
+        foreach (explode('/', $path) as $segment) {
+            if ($segment === '' || $segment === '.') {
+                continue;
+            }
+            if ($segment === '..' || str_contains($segment, '..')) {
+                throw new \InvalidArgumentException("Invalid path: path traversal detected in [{$path}]");
+            }
+            $parts[] = $segment;
+        }
+        return implode(DIRECTORY_SEPARATOR, $parts);
+    }
+
     public function getFullPath(string $path): string
     {
-        return $this->root . DIRECTORY_SEPARATOR . ltrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path), DIRECTORY_SEPARATOR);
+        $relative = $this->normalizeRelativePath($path);
+        return $relative !== '' ? $this->root . DIRECTORY_SEPARATOR . $relative : $this->root;
     }
 
     public function put(string $path, string $contents, array $options = []): bool

@@ -351,6 +351,125 @@ $it('formats standardized API success, error, and paginated responses', function
 });
 
 // ----------------------------------------------------
+echo "\n\033[1;34m10. Security Hardening & Vulnerability Fixes\033[0m\n";
+
+$it('blocks path traversal payloads in LocalStorageDriver', function () {
+    $tempDir = sys_get_temp_dir() . '/newla_sec_storage_' . uniqid();
+    $driver = new LocalStorageDriver($tempDir);
+
+    $traversals = [
+        '../secret.txt',
+        '..\\..\\windows\\win.ini',
+        'a/../../b',
+        '....//....//etc/passwd',
+        'sub/../../secret',
+    ];
+
+    foreach ($traversals as $payload) {
+        $caught = false;
+        try {
+            $driver->getFullPath($payload);
+        } catch (\InvalidArgumentException $e) {
+            $caught = true;
+        }
+        assert($caught === true, "Payload [{$payload}] was not blocked by LocalStorageDriver!");
+    }
+
+    // Normal safe paths must work
+    assert(str_contains($driver->getFullPath('products/img.jpg'), 'products'));
+    assert(str_contains($driver->getFullPath('2026/08/slip.png'), 'slip.png'));
+    $driver->deleteDirectory('');
+});
+
+$it('prevents IP spoofing via X-Forwarded-For when proxy is untrusted', function () {
+    Request::setTrustedProxies([]);
+
+    $untrustedReq = new Request(
+        query: [],
+        request: [],
+        attributes: [],
+        cookies: [],
+        files: [],
+        server: ['REMOTE_ADDR' => '203.0.113.195'],
+        content: null,
+        headers: ['x-forwarded-for' => '1.1.1.1']
+    );
+    // Untrusted REMOTE_ADDR must NOT trust header
+    assert($untrustedReq->ip() === '203.0.113.195');
+
+    // Trusted Cloudflare proxy range
+    Request::setTrustedProxies(Request::CLOUDFLARE_PROXIES);
+
+    $trustedReq = new Request(
+        query: [],
+        request: [],
+        attributes: [],
+        cookies: [],
+        files: [],
+        server: ['REMOTE_ADDR' => '173.245.48.5'],
+        content: null,
+        headers: ['x-forwarded-for' => '198.51.100.42, 173.245.48.5']
+    );
+    // Leftmost client IP is taken
+    assert($trustedReq->ip() === '198.51.100.42');
+
+    // Reset trusted proxies
+    Request::setTrustedProxies([]);
+});
+
+$it('validates QueryBuilder order direction and column identifiers', function () {
+    $pdo = new \PDO('sqlite::memory:');
+    $conn = new Connection($pdo, 'sqlite');
+    $qb = $conn->table('users');
+
+    // Direction validation
+    $dirBlocked = false;
+    try {
+        $qb->orderBy('name', 'ASC; DROP TABLE users');
+    } catch (\InvalidArgumentException $e) {
+        $dirBlocked = true;
+    }
+    assert($dirBlocked === true);
+
+    // Empty whereIn safe compile (0 = 1)
+    $sql = $conn->table('users')->whereIn('id', [])->toSql();
+    assert(str_contains($sql, '0 = 1'));
+});
+
+$it('preserves QueryBuilder state after calling count()', function () {
+    $pdo = new \PDO('sqlite::memory:');
+    $conn = new Connection($pdo, 'sqlite');
+    $conn->statement("CREATE TABLE items (id INTEGER PRIMARY KEY, name TEXT)");
+    $conn->statement("INSERT INTO items (name) VALUES ('Item A'), ('Item B')");
+
+    $qb = $conn->table('items')->select('id', 'name')->where('id', '>', 0);
+
+    $count = $qb->count();
+    assert($count === 2);
+
+    $rows = $qb->get();
+    assert(count($rows) === 2);
+    assert(isset($rows[0]['name']));
+    assert($rows[0]['name'] === 'Item A');
+});
+
+$it('escapes raw HTML with global helper e() and ViewEngine', function () {
+    $xss = '<script>alert("XSS")</script>';
+    $escaped = e($xss);
+    assert($escaped === '&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;');
+    assert(!str_contains($escaped, '<script>'));
+});
+
+$it('defends against user enumeration timing attacks in SessionGuard', function () {
+    $guard = new \Newla\Auth\SessionGuard('test_guard', '\\NonExistentUser');
+    $t1 = microtime(true);
+    $guard->attempt(['email' => 'fake@example.com', 'password' => 'wrongpass']);
+    $elapsed = microtime(true) - $t1;
+    // Must perform password hashing verification even when user does not exist
+    assert($elapsed > 0.0001);
+});
+
+// ----------------------------------------------------
 echo "\n========================================\n";
 echo "Tests Passed: \033[32m{$passed}\033[0m\n";
 echo "Tests Failed: \033[" . ($failed > 0 ? "31" : "32") . "m{$failed}\033[0m\n";

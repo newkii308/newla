@@ -26,7 +26,8 @@ class Request
         array $cookies = [],
         array $files = [],
         array $server = [],
-        ?string $content = null
+        ?string $content = null,
+        array $headers = []
     ) {
         $this->query = $query;
         $this->request = $request;
@@ -35,7 +36,8 @@ class Request
         $this->files = $files;
         $this->server = $server;
         $this->rawBody = $content;
-        $this->headers = $this->extractHeaders($server);
+        $extracted = $this->extractHeaders($server);
+        $this->headers = array_merge($extracted, array_change_key_case($headers, CASE_LOWER));
     }
 
     public static function capture(): static
@@ -131,10 +133,101 @@ class Request
             || ($this->header('x-forwarded-proto') === 'https');
     }
 
+    public const CLOUDFLARE_PROXIES = [
+        '173.245.48.0/20',
+        '103.21.244.0/22',
+        '103.22.200.0/22',
+        '103.31.4.0/22',
+        '141.101.64.0/18',
+        '108.162.192.0/18',
+        '190.93.240.0/20',
+        '188.114.96.0/20',
+        '197.234.240.0/22',
+        '198.41.128.0/17',
+        '162.158.0.0/15',
+        '104.16.0.0/13',
+        '104.24.0.0/14',
+        '172.64.0.0/13',
+        '131.0.72.0/22',
+    ];
+
+    protected static array $trustedProxies = [];
+
+    public static function setTrustedProxies(array $proxies): void
+    {
+        static::$trustedProxies = $proxies;
+    }
+
+    public static function getTrustedProxies(): array
+    {
+        return static::$trustedProxies;
+    }
+
+    public function isTrustedProxy(string $ip): bool
+    {
+        if (empty(static::$trustedProxies)) {
+            return false;
+        }
+
+        foreach (static::$trustedProxies as $trusted) {
+            if ($trusted === '*' || $trusted === $ip) {
+                return true;
+            }
+
+            if (str_contains($trusted, '/')) {
+                if ($this->ipMatchesCidr($ip, $trusted)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    protected function ipMatchesCidr(string $ip, string $cidr): bool
+    {
+        [$subnet, $mask] = explode('/', $cidr, 2);
+        $mask = (int) $mask;
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $ipLong = ip2long($ip);
+            $subnetLong = ip2long($subnet);
+            $maskLong = -1 << (32 - $mask);
+            return ($ipLong & $maskLong) === ($subnetLong & $maskLong);
+        }
+
+        return false;
+    }
+
     public function ip(): string
     {
-        return $this->header('x-forwarded-for')
-            ?? ($this->server['REMOTE_ADDR'] ?? '127.0.0.1');
+        $remoteAddr = $this->server['REMOTE_ADDR'] ?? '127.0.0.1';
+
+        if ($this->isTrustedProxy($remoteAddr)) {
+            if ($cfIp = $this->header('cf-connecting-ip')) {
+                $cfIp = trim($cfIp);
+                if (filter_var($cfIp, FILTER_VALIDATE_IP)) {
+                    return $cfIp;
+                }
+            }
+
+            if ($forwarded = $this->header('x-forwarded-for')) {
+                $ips = explode(',', $forwarded);
+                $clientIp = trim($ips[0]);
+                if (filter_var($clientIp, FILTER_VALIDATE_IP)) {
+                    return $clientIp;
+                }
+            }
+
+            if ($realIp = $this->header('x-real-ip')) {
+                $realIp = trim($realIp);
+                if (filter_var($realIp, FILTER_VALIDATE_IP)) {
+                    return $realIp;
+                }
+            }
+        }
+
+        return $remoteAddr;
     }
 
     public function userAgent(): ?string
