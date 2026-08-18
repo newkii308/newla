@@ -9,7 +9,7 @@ use Newla\Cli\Output\ConsoleOutput;
 
 class Application
 {
-    public const VERSION = '1.0.1';
+    public const VERSION = '1.0.3';
 
     /** @var array<string, CommandInterface> */
     protected array $commands = [];
