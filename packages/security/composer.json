@@ -1,0 +1,15 @@
+{
+    "name": "newla/security",
+    "description": "Security utilities, CSRF, Rate Limiting, Session & Password Hashing for NEWLA",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2",
+        "newla/core": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Newla\\Security\\": "src/"
+        }
+    }
+}

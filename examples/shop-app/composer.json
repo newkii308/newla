@@ -1,0 +1,20 @@
+{
+    "name": "app/examples/shop-app",
+    "description": "NEWLA Application: examples/shop-app",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "newla/core": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    }
+}

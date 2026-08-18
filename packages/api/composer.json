@@ -1,0 +1,15 @@
+{
+    "name": "newla/api",
+    "description": "Standardized REST API responses, pagination, and exception handling for NEWLA Framework",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2",
+        "newla/core": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Newla\\Api\\": "src/"
+        }
+    }
+}

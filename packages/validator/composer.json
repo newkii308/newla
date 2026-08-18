@@ -1,0 +1,14 @@
+{
+    "name": "newla/validator",
+    "description": "Data validation package for NEWLA Framework",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Newla\\Validator\\": "src/"
+        }
+    }
+}

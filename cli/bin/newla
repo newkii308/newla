@@ -1,0 +1,28 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$autoloadPaths = [
+    getcwd() . '/vendor/autoload.php',
+    __DIR__ . '/../../vendor/autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+];
+
+$autoloaderFound = false;
+foreach ($autoloadPaths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        $autoloaderFound = true;
+        break;
+    }
+}
+
+if (!$autoloaderFound) {
+    fwrite(STDERR, "Unable to find composer autoloader. Please run 'composer install'.\n");
+    exit(1);
+}
+
+$app = new Newla\Cli\Application();
+$exitCode = $app->run($argv);
+exit($exitCode);

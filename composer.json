@@ -1,0 +1,48 @@
+{
+    "name": "newla/newla",
+    "description": "NEWLA \u2014 Modern, lightweight, native PHP framework and developer toolkit",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "NEWLA Core Team",
+            "email": "dev@newla.dev"
+        }
+    ],
+    "require": {
+        "php": ">=8.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5 || ^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Newla\\Core\\": "packages/core/src/",
+            "Newla\\Security\\": "packages/security/src/",
+            "Newla\\Validator\\": "packages/validator/src/",
+            "Newla\\Logger\\": "packages/logger/src/",
+            "Newla\\Storage\\": "packages/storage/src/",
+            "Newla\\Image\\": "packages/image/src/",
+            "Newla\\Auth\\": "packages/auth/src/",
+            "Newla\\Api\\": "packages/api/src/",
+            "Newla\\Cli\\": "cli/src/"
+        },
+        "files": [
+            "packages/core/src/Support/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Newla\\Tests\\": "tests/"
+        }
+    },
+    "bin": [
+        "cli/bin/newla"
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

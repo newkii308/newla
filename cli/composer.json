@@ -1,0 +1,17 @@
+{
+    "name": "newla/cli",
+    "description": "Command Line Interface for the NEWLA Developer Toolkit",
+    "type": "library",
+    "license": "MIT",
+    "bin": [
+        "bin/newla"
+    ],
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Newla\\Cli\\": "src/"
+        }
+    }
+}

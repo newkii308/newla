@@ -1,0 +1,14 @@
+{
+    "name": "newla/logger",
+    "description": "Lightweight multi-channel logging system for NEWLA Framework",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Newla\\Logger\\": "src/"
+        }
+    }
+}

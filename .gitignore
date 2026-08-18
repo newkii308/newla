@@ -1,0 +1,17 @@
+﻿.env
+.env.backup
+.phpunit.result.cache
+vendor/
+composer.lock
+storage/logs/*.log
+storage/cache/*
+storage/uploads/*
+storage/database.sqlite
+examples/shop-app/vendor/
+examples/shop-app/.env
+examples/shop-app/storage/logs/*.log
+examples/shop-app/storage/cache/*
+examples/shop-app/storage/database.sqlite
+.DS_Store
+Thumbs.db
+

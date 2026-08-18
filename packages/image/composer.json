@@ -1,0 +1,15 @@
+{
+    "name": "newla/image",
+    "description": "Secure image processing, optimization, thumbnailing, and conversion for NEWLA Framework",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2",
+        "ext-gd": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Newla\\Image\\": "src/"
+        }
+    }
+}

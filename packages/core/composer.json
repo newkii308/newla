@@ -1,0 +1,17 @@
+{
+    "name": "newla/core",
+    "description": "Core components for the NEWLA Framework",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Newla\\Core\\": "src/"
+        },
+        "files": [
+            "src/Support/helpers.php"
+        ]
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "name": "newla/auth",
+    "description": "Authentication system for NEWLA Framework",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2",
+        "newla/core": "*",
+        "newla/security": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Newla\\Auth\\": "src/"
+        }
+    }
+}
