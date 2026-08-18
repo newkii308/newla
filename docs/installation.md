@@ -92,3 +92,12 @@ curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | s
 ```bash
 newla doctor
 ```
+---
+
+## 6. การอัปเดต NEWLA CLI เป็นเวอร์ชันล่าสุด
+
+เมื่อมีเวอร์ชันใหม่ปล่อยออกมา สามารถสั่งอัปเดตได้ทันทีด้วยคำสั่ง:
+
+```bash
+newla self-update
+```

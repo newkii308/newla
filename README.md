@@ -79,6 +79,24 @@ newla dev
 
 ---
 
+
+---
+
+## 🔄 การอัปเดตเวอร์ชัน (Updating NEWLA CLI)
+
+สำหรับผู้ที่ติดตั้ง NEWLA CLI ไว้ในเครื่องอยู่แล้ว สามารถอัปเดตเป็นเวอร์ชันล่าสุดได้ง่ายๆ ด้วย **คำสั่งเดียว**:
+
+```bash
+newla self-update
+```
+*(หรือ `newla update self` ระบบจะดาวน์โหลดและอัปเกรดเป็นเวอร์ชันล่าสุดจาก GitHub ให้อัตโนมัติทันที)*
+
+หากติดตั้งผ่าน Composer Global สามารถใช้:
+```bash
+composer global update newla/newla
+```
+
+---
 ## 🛠️ สรุปคำสั่ง CLI ทั้งหมด
 
 ```text
@@ -91,6 +109,7 @@ newla dev
 คำสั่งจัดการแพ็กเกจ:
   newla add <pkg>         ติดตั้งแพ็กเกจโมดูล (เช่น newla add security)
   newla remove <pkg>      ลบแพ็กเกจออกจาก newla.json
+  newla self-update       อัปเดต NEWLA CLI เป็นเวอร์ชันล่าสุดโดยอัตโนมัติ
   newla update            อัปเดตแพ็กเกจและ dependencies
   newla list              ดูรายการคำสั่งทั้งหมด หรือดูรายชื่อ packages
 

@@ -9,7 +9,7 @@ use Newla\Cli\Output\ConsoleOutput;
 
 class Application
 {
-    public const VERSION = '1.0.0';
+    public const VERSION = '1.0.1';
 
     /** @var array<string, CommandInterface> */
     protected array $commands = [];
@@ -35,6 +35,7 @@ class Application
         $this->register(new Command\AddCommand());
         $this->register(new Command\RemoveCommand());
         $this->register(new Command\UpdateCommand());
+        $this->register(new Command\SelfUpdateCommand());
         $this->register(new Command\ListCommand($this->commands));
         $this->register(new Command\DevCommand());
         $this->register(new Command\ServeCommand());

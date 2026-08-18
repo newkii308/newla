@@ -17,6 +17,7 @@ The `newla` command line interface simplifies every aspect of project creation, 
 ### Package Management
 - `newla add <package>`: Register and configure a modular package (e.g., `newla add security`).
 - `newla remove <package>`: Remove a package from `newla.json`.
+- `newla self-update`: อัปเดตตัว NEWLA CLI ในเครื่องเป็นเวอร์ชันล่าสุดจาก GitHub โดยอัตโนมัติ
 - `newla update`: Update dependencies.
 - `newla list [packages]`: List all available CLI commands or modular packages.
 
