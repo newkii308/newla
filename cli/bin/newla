@@ -3,6 +3,19 @@
 
 declare(strict_types=1);
 
+// 1. Always guarantee CLI classes autoloading
+spl_autoload_register(function (string $class) {
+    if (str_starts_with($class, 'Newla\\Cli\\')) {
+        $relative = substr($class, 10);
+        $file = __DIR__ . '/../src/' . str_replace('\\', DIRECTORY_SEPARATOR, $relative) . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
+    }
+});
+
+// 2. Load framework packages autoloader
 $autoloadPaths = [
     getcwd() . '/vendor/autoload.php',
     __DIR__ . '/../../vendor/autoload.php',
@@ -18,9 +31,36 @@ foreach ($autoloadPaths as $path) {
     }
 }
 
-if (!$autoloaderFound) {
-    fwrite(STDERR, "Unable to find composer autoloader. Please run 'composer install'.\n");
-    exit(1);
+// 3. Fallback for framework packages if running standalone
+if (!class_exists('Newla\\Core\\Application')) {
+    $packagesDir = dirname(__DIR__, 2) . '/packages';
+    if (is_dir($packagesDir)) {
+        spl_autoload_register(function (string $class) use ($packagesDir) {
+            $prefixes = [
+                'Newla\\Core\\' => $packagesDir . '/core/src/',
+                'Newla\\Security\\' => $packagesDir . '/security/src/',
+                'Newla\\Validator\\' => $packagesDir . '/validator/src/',
+                'Newla\\Logger\\' => $packagesDir . '/logger/src/',
+                'Newla\\Storage\\' => $packagesDir . '/storage/src/',
+                'Newla\\Image\\' => $packagesDir . '/image/src/',
+                'Newla\\Auth\\' => $packagesDir . '/auth/src/',
+                'Newla\\Api\\' => $packagesDir . '/api/src/',
+            ];
+            foreach ($prefixes as $prefix => $dir) {
+                if (str_starts_with($class, $prefix)) {
+                    $relative = substr($class, strlen($prefix));
+                    $file = $dir . str_replace('\\', DIRECTORY_SEPARATOR, $relative) . '.php';
+                    if (file_exists($file)) {
+                        require_once $file;
+                        return;
+                    }
+                }
+            }
+        });
+        if (file_exists($packagesDir . '/core/src/Support/helpers.php')) {
+            require_once $packagesDir . '/core/src/Support/helpers.php';
+        }
+    }
 }
 
 $app = new Newla\Cli\Application();

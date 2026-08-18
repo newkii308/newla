@@ -19,7 +19,11 @@ class CreateCommand extends Command
             return 1;
         }
 
-        $targetDir = rtrim(getcwd() ?: '.', '/\\') . DIRECTORY_SEPARATOR . $projectName;
+                if (str_starts_with($projectName, '/') || str_starts_with($projectName, '\\') || (isset($projectName[1]) && $projectName[1] === ':')) {
+            $targetDir = $projectName;
+        } else {
+            $targetDir = rtrim(getcwd() ?: '.', '/\\') . DIRECTORY_SEPARATOR . $projectName;
+        }
         if (is_dir($targetDir) && count(scandir($targetDir)) > 2) {
             $output->error("Directory [{$projectName}] already exists and is not empty.");
             return 1;
@@ -31,6 +35,7 @@ class CreateCommand extends Command
         $steps = [
             'Directory structure' => fn() => $this->createDirectories($targetDir),
             'Configuration' => fn() => $this->createConfig($targetDir, $projectName),
+            'Vendor & Core Packages' => fn() => $this->createVendor($targetDir),
             'Bootstrap' => fn() => $this->createBootstrap($targetDir),
             'Environment (.env)' => fn() => $this->createEnv($targetDir, $projectName),
             'Public Document Root' => fn() => $this->createPublic($targetDir),
@@ -98,6 +103,47 @@ class CreateCommand extends Command
         }
     }
 
+    protected function createVendor(string $base): void
+    {
+        $vendorDir = $base . DIRECTORY_SEPARATOR . 'vendor';
+        if (!is_dir($vendorDir)) {
+            mkdir($vendorDir, 0777, true);
+        }
+
+        $packagesSrc = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'packages';
+        if (is_dir($packagesSrc)) {
+            $this->copyDir($packagesSrc, $vendorDir . DIRECTORY_SEPARATOR . 'newla');
+        }
+
+        $autoloader = "<?php\n\ndeclare(strict_types=1);\n\n/**\n * NEWLA Standalone PSR-4 Autoloader\n * Generated automatically on project creation.\n */\n\nspl_autoload_register(function (string \$class) {\n    \$prefixes = [\n        'App\\\\' => dirname(__DIR__) . '/app/',\n        'Database\\\\' => dirname(__DIR__) . '/database/',\n        'Newla\\\\Core\\\\' => __DIR__ . '/newla/core/src/',\n        'Newla\\\\Security\\\\' => __DIR__ . '/newla/security/src/',\n        'Newla\\\\Validator\\\\' => __DIR__ . '/newla/validator/src/',\n        'Newla\\\\Logger\\\\' => __DIR__ . '/newla/logger/src/',\n        'Newla\\\\Storage\\\\' => __DIR__ . '/newla/storage/src/',\n        'Newla\\\\Image\\\\' => __DIR__ . '/newla/image/src/',\n        'Newla\\\\Auth\\\\' => __DIR__ . '/newla/auth/src/',\n        'Newla\\\\Api\\\\' => __DIR__ . '/newla/api/src/',\n    ];\n\n    foreach (\$prefixes as \$prefix => \$dir) {\n        if (str_starts_with(\$class, \$prefix)) {\n            \$relative = substr(\$class, strlen(\$prefix));\n            \$file = \$dir . str_replace('\\\\', DIRECTORY_SEPARATOR, \$relative) . '.php';\n            if (file_exists(\$file)) {\n                require_once \$file;\n                return;\n            }\n        }\n    }\n});\n\nif (file_exists(__DIR__ . '/newla/core/src/Support/helpers.php')) {\n    require_once __DIR__ . '/newla/core/src/Support/helpers.php';\n}\n";
+
+        file_put_contents($vendorDir . '/autoload.php', $autoloader);
+    }
+
+    protected function copyDir(string $src, string $dst): void
+    {
+        $dir = @opendir($src);
+        if (!$dir) return;
+
+        if (!is_dir($dst)) {
+            mkdir($dst, 0777, true);
+        }
+
+        while (false !== ($file = readdir($dir))) {
+            if ($file !== '.' && $file !== '..') {
+                $srcPath = $src . DIRECTORY_SEPARATOR . $file;
+                $dstPath = $dst . DIRECTORY_SEPARATOR . $file;
+
+                if (is_dir($srcPath)) {
+                    $this->copyDir($srcPath, $dstPath);
+                } else {
+                    copy($srcPath, $dstPath);
+                }
+            }
+        }
+        closedir($dir);
+    }
+
     protected function createConfig(string $base, string $name): void
     {
         $appConfig = "<?php\n\nreturn [\n    'name' => env('APP_NAME', 'NEWLA Application'),\n    'env' => env('APP_ENV', 'local'),\n    'debug' => (bool) env('APP_DEBUG', true),\n    'url' => env('APP_URL', 'http://127.0.0.1:8000'),\n    'timezone' => env('APP_TIMEZONE', 'UTC'),\n];\n";
@@ -115,10 +161,7 @@ class CreateCommand extends Command
 
     protected function createBootstrap(string $base): void
     {
-        $cliVendor = str_replace('\\', '/', dirname(__DIR__, 3) . '/vendor/autoload.php');
-        $cliPackages = str_replace('\\', '/', dirname(__DIR__, 3) . '/packages');
-
-        $content = "<?php\n\ndeclare(strict_types=1);\n\n\$autoloadPaths = [\n    dirname(__DIR__) . '/vendor/autoload.php',\n    dirname(__DIR__, 2) . '/vendor/autoload.php',\n    dirname(__DIR__, 3) . '/vendor/autoload.php',\n    '{$cliVendor}',\n];\n\n\$loaded = false;\nforeach (\$autoloadPaths as \$path) {\n    if (file_exists(\$path)) {\n        require_once \$path;\n        \$loaded = true;\n        break;\n    }\n}\n\nif (!\$loaded) {\n    spl_autoload_register(function (string \$class) {\n        \$packagesDir = '{$cliPackages}';\n        \$prefixes = [\n            'Newla\\\\Core\\\\' => \$packagesDir . '/core/src/',\n            'Newla\\\\Security\\\\' => \$packagesDir . '/security/src/',\n            'Newla\\\\Validator\\\\' => \$packagesDir . '/validator/src/',\n            'Newla\\\\Logger\\\\' => \$packagesDir . '/logger/src/',\n            'Newla\\\\Storage\\\\' => \$packagesDir . '/storage/src/',\n            'Newla\\\\Image\\\\' => \$packagesDir . '/image/src/',\n            'Newla\\\\Auth\\\\' => \$packagesDir . '/auth/src/',\n            'Newla\\\\Api\\\\' => \$packagesDir . '/api/src/',\n        ];\n        foreach (\$prefixes as \$prefix => \$dir) {\n            if (str_starts_with(\$class, \$prefix)) {\n                \$relative = substr(\$class, strlen(\$prefix));\n                \$file = \$dir . str_replace('\\\\', DIRECTORY_SEPARATOR, \$relative) . '.php';\n                if (file_exists(\$file)) {\n                    require_once \$file;\n                    return;\n                }\n            }\n        }\n    });\n    if (file_exists('{$cliPackages}/core/src/Support/helpers.php')) {\n        require_once '{$cliPackages}/core/src/Support/helpers.php';\n    }\n}\n\n\$app = new Newla\\Core\\Application(dirname(__DIR__));\n\nreturn \$app;\n";
+        $content = "<?php\n\ndeclare(strict_types=1);\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n\$app = new Newla\\Core\\Application(dirname(__DIR__));\n\nreturn \$app;\n";
         file_put_contents($base . '/bootstrap/app.php', $content);
     }
 
@@ -140,11 +183,11 @@ class CreateCommand extends Command
 
     protected function createRoutes(string $base): void
     {
-        $webRoutes = "<?php\n\ndeclare(strict_types=1);\n\nuse Newla\\Core\\Routing\\RouteFacade as Route;\nuse App\\Controllers\\HomeController;\n\nRoute::get('/', [HomeController::class, 'index']);\nRoute::get('/health', function () {\n    return json(['status' => 'ok', 'framework' => 'NEWLA', 'timestamp' => time()]);\n});\n";
-        file_put_contents($base . '/routes/web.php', $webRoutes);
+        $web = "<?php\n\ndeclare(strict_types=1);\n\nuse Newla\\Core\\Routing\\RouteFacade as Route;\nuse App\\Controllers\\HomeController;\n\nRoute::get('/', [HomeController::class, 'index']);\n";
+        file_put_contents($base . '/routes/web.php', $web);
 
-        $apiRoutes = "<?php\n\ndeclare(strict_types=1);\n\nuse Newla\\Core\\Routing\\RouteFacade as Route;\n\nRoute::get('/version', function () {\n    return json([\n        'version' => '1.0.0',\n        'framework' => 'NEWLA',\n        'php' => PHP_VERSION,\n    ]);\n});\n";
-        file_put_contents($base . '/routes/api.php', $apiRoutes);
+        $api = "<?php\n\ndeclare(strict_types=1);\n\nuse Newla\\Core\\Routing\\RouteFacade as Route;\n\nRoute::get('/ping', fn() => json(['pong' => true, 'timestamp' => time()]));\n";
+        file_put_contents($base . '/routes/api.php', $api);
     }
 
     protected function createDefaults(string $base): void
@@ -168,7 +211,7 @@ class CreateCommand extends Command
             'license' => 'proprietary',
             'require' => [
                 'php' => '>=8.2',
-                'newla/core' => '*'
+                'newla/newla' => '^1.0'
             ],
             'autoload' => [
                 'psr-4' => [
@@ -201,10 +244,10 @@ class CreateCommand extends Command
 
     protected function createGitFiles(string $base, string $name): void
     {
-        $gitignore = ".env\nvendor/\nstorage/logs/*.log\nstorage/cache/*\nstorage/uploads/*\nstorage/database.sqlite\n.phpunit.result.cache\n";
+        $gitignore = ".env\nstorage/logs/*.log\nstorage/cache/*\nstorage/database.sqlite\n";
         file_put_contents($base . '/.gitignore', $gitignore);
 
-        $readme = "# {$name}\n\nBuilt with [NEWLA](https://newla.dev) — Modern Native PHP Framework.\n\n## Getting Started\n\n```bash\n# Start development server\nnewla dev\n\n# Run migrations\nnewla migrate\n\n# Run tests\nnewla test\n```\n";
+        $readme = "# {$name}\n\nBuilt with [NEWLA Framework](https://github.com/newkii308/newla).\n\n## Development\n\n```bash\nnewla dev\n```\n";
         file_put_contents($base . '/README.md', $readme);
     }
 }
