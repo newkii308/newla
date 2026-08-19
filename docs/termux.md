@@ -12,7 +12,7 @@ pkg install -y php composer git
 ## 2. ติดตั้ง NEWLA CLI
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | sh
+curl -fsSL newla-dev.verin.online | bash
 ```
 
 เพิ่ม PATH ใน `~/.bashrc`:

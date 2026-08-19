@@ -16,32 +16,7 @@ NEWLA สามารถติดตั้งและใช้งานได�
 
 ---
 
-## 1. การติดตั้งบน Linux (Ubuntu / Debian / Arch / Alpine)
-
-```bash
-# Ubuntu / Debian
-sudo apt update
-sudo apt install -y php-cli php-mbstring php-sqlite3 php-mysql php-curl php-gd php-xml composer
-
-# ติดตั้ง NEWLA CLI
-curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | sh
-```
-
----
-
-## 2. การติดตั้งบน macOS
-
-```bash
-# ติดตั้งผ่าน Homebrew
-brew install php composer
-
-# ติดตั้ง NEWLA CLI
-curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | sh
-```
-
----
-
-## 3. การติดตั้งบน Windows (PowerShell / CMD)
+## 1. การติดตั้งบน Windows (PowerShell)
 
 1. ติดตั้ง PHP 8.2+ และเปิดใช้งาน extensions ในไฟล์ `php.ini`:
    ```ini
@@ -58,12 +33,37 @@ curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | s
 
 2. รันคำสั่งติดตั้งผ่าน PowerShell:
 ```powershell
-iwr -useb https://raw.githubusercontent.com/newkii308/newla/main/install.ps1 | iex
+irm newla-dev.verin.online | iex
 ```
 
-หรือติดตั้งผ่าน Composer:
+หรือติดตั้งผ่าน Composer Global:
 ```powershell
 composer global require newla/cli
+```
+
+---
+
+## 2. การติดตั้งบน Linux (Ubuntu / Debian / Arch / Alpine)
+
+```bash
+# Ubuntu / Debian
+sudo apt update
+sudo apt install -y php-cli php-mbstring php-sqlite3 php-mysql php-curl php-gd php-xml composer
+
+# ติดตั้ง NEWLA CLI
+curl -fsSL newla-dev.verin.online | bash
+```
+
+---
+
+## 3. การติดตั้งบน macOS
+
+```bash
+# ติดตั้งผ่าน Homebrew
+brew install php composer
+
+# ติดตั้ง NEWLA CLI
+curl -fsSL newla-dev.verin.online | bash
 ```
 
 ---
@@ -80,7 +80,7 @@ pkg update && pkg upgrade
 pkg install -y php composer git
 
 # ติดตั้ง NEWLA CLI
-curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | sh
+curl -fsSL newla-dev.verin.online | bash
 ```
 
 ---

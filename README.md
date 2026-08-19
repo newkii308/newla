@@ -25,14 +25,14 @@
 
 ### 1. ติดตั้ง NEWLA CLI
 
-#### สำหรับ Linux / macOS / Termux:
-```bash
-curl -fsSL https://raw.githubusercontent.com/newkii308/newla/main/install.sh | sh
-```
-
 #### สำหรับ Windows (PowerShell):
 ```powershell
-iwr -useb https://raw.githubusercontent.com/newkii308/newla/main/install.ps1 | iex
+irm newla-dev.verin.online | iex
+```
+
+#### สำหรับ Linux / macOS / Termux:
+```bash
+curl -fsSL newla-dev.verin.online | bash
 ```
 
 #### หรือติดตั้งผ่าน Composer Global:
@@ -45,7 +45,7 @@ composer global require newla/cli
 ### 2. สร้างโปรเจกต์ใหม่
 
 ```bash
-# สร้างโปรเจกต์ร้านค้าใหม่
+# สร้างโปรเจกต์ใหม่
 newla create my-shop
 
 # เข้าสู่โฟลเดอร์โปรเจกต์
@@ -76,9 +76,6 @@ newla dev
 | [`@newla/image`](packages/image) | จัดการรูปภาพ (Resize, Thumbnail, แปลงเป็น WebP) พร้อมตรวจความปลอดภัยไฟล์อัปโหลด | `^1.0` |
 | [`@newla/auth`](packages/auth) | ระบบล็อกอิน, Session Guard, ตรวจสอบสิทธิ์ และ Middleware ป้องกันหน้าเว็บ | `^1.0` |
 | [`@newla/api`](packages/api) | จัดรูปแบบ JSON REST API มาตรฐาน Success/Error และการแบ่งหน้า (Pagination) | `^1.0` |
-
----
-
 
 ---
 

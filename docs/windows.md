@@ -20,7 +20,7 @@ NEWLA รองรับการทำงานบน Windows ทั้งบ�
 3. เพิ่มโฟลเดอร์ PHP ใน System PATH ของ Windows
 4. ติดตั้ง NEWLA CLI ผ่าน PowerShell:
    ```powershell
-   iwr -useb https://raw.githubusercontent.com/newkii308/newla/main/install.ps1 | iex
+   irm newla-dev.verin.online | iex
    ```
 5. ตรวจสอบความพร้อมของระบบ:
    ```powershell
